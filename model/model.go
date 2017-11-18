@@ -1,0 +1,27 @@
+package model
+
+import (
+	"math/big"
+	"time"
+)
+
+type Currency struct {
+	Id   string
+	Name string
+}
+
+type PortfolioEntry struct {
+	CurrencyId string    `json:"currency"`
+	Amount     big.Float `json:"amount"`
+}
+
+type Quote struct {
+	CurrencyId    string
+	Price         big.Float
+	Volume        big.Float
+	High          big.Float
+	Low           big.Float
+	Change        big.Float
+	PercentChange big.Float
+	Period        time.Duration
+}
