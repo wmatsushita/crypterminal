@@ -1,13 +1,12 @@
 package main
 
 import (
-	"github.com/wmatsushita/mycrypto/mvp"
-	"os"
 	"encoding/json"
 	"io/ioutil"
+	"os"
+
 	"github.com/wmatsushita/mycrypto/common"
-	"github.com/emirpasic/gods/sets"
-	"github.com/emirpasic/gods/sets/hashset"
+	"github.com/wmatsushita/mycrypto/mvp"
 )
 
 type (
@@ -18,9 +17,9 @@ type (
 	}
 
 	JsonFilePortfolioLoader struct {
-		filePath  string
-		portfolio []*mvp.PortfolioEntry
-		subscriptions sets.Set
+		filePath   string
+		portfolio  []*mvp.PortfolioEntry
+		observable *common.EmptySignalObservable
 	}
 )
 
@@ -29,9 +28,9 @@ func NewJsonFilePortfolioLoader(filePath string) (*JsonFilePortfolioLoader, erro
 		return nil, common.NewError("The given portifolio file path does not exist.")
 	}
 	return &JsonFilePortfolioLoader{
-		filePath:  filePath,
-		portfolio: make([]*mvp.PortfolioEntry,0),
-		subscriptions: hashset.New(),
+		filePath:   filePath,
+		portfolio:  make([]*mvp.PortfolioEntry, 0),
+		observable: common.NewEmptySignalObservable(),
 	}, nil
 }
 
@@ -62,22 +61,14 @@ func (loader *JsonFilePortfolioLoader) GetPortfolio() ([]*mvp.PortfolioEntry, er
 	return loader.portfolio, nil
 }
 
-func (loader *JsonFilePortfolioLoader) Subscribe() chan bool {
-	subscription := make(chan bool)
-	loader.subscriptions.Add(subscription)
-
-	return subscription
+func (loader *JsonFilePortfolioLoader) Subscribe() chan struct{} {
+	return loader.observable.Subscribe()
 }
 
-func (loader *JsonFilePortfolioLoader) Unsubscribe(subscription chan bool) {
-	loader.subscriptions.Remove(subscription)
+func (loader *JsonFilePortfolioLoader) Unsubscribe(subscription chan struct{}) {
+	loader.observable.Unsubscribe(subscription)
 }
 
 func (loader *JsonFilePortfolioLoader) Notify() {
-	for  _, subscription := range loader.subscriptions.Values() {
-		c, okToCast := subscription.(chan bool)
-		if okToCast {
-			go func() { c <- true }()
-		}
-	}
+	loader.observable.Notify()
 }
