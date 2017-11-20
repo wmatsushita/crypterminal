@@ -1,4 +1,4 @@
-package model
+package mvp
 
 import (
 	"math/big"

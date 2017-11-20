@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/wmatsushita/mycrypto/ui"
+	"github.com/wmatsushita/mycrypto/mvp"
 )
 
 func main() {
 
-	screen := ui.NewTermuiPortfolioScreen()
+	screen := mvp.NewTermuiPortfolioScreen()
 
-	screen.Start()
+	screen.Init()
 
 }
+
+

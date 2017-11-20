@@ -1,19 +1,26 @@
-package ui
+package mvp
 
 import (
 	"github.com/gizak/termui"
-	"github.com/wmatsushita/mycrypto/model"
 )
 
-type TermuiPortfolioScreen struct {
-	title          *termui.Par
-	menu           *termui.List
-	portfolioTable *termui.Table
-	statusBar      *termui.Par
-}
+type (
+	PortfolioView interface {
+		Init()
+		Quit()
+		Refresh(portifolio []PortfolioEntry, quotes []Quote)
+	}
 
-func NewTermuiPortfolioScreen() *TermuiPortfolioScreen {
-	return &TermuiPortfolioScreen{
+	TermuiPortfolioView struct {
+		title          *termui.Par
+		menu           *termui.List
+		portfolioTable *termui.Table
+		statusBar      *termui.Par
+	}
+)
+
+func NewTermuiPortfolioScreen() *TermuiPortfolioView {
+	return &TermuiPortfolioView{
 		title:          createTitle(),
 		menu:           createMenu(),
 		portfolioTable: createPortfolioTable(),
@@ -21,7 +28,7 @@ func NewTermuiPortfolioScreen() *TermuiPortfolioScreen {
 	}
 }
 
-func (screen *TermuiPortfolioScreen) Start() {
+func (screen *TermuiPortfolioView) Init() {
 	err := termui.Init()
 	if err != nil {
 		panic(err)
@@ -110,9 +117,9 @@ func createTitle() *termui.Par {
 	return title
 }
 
-func (screen *TermuiPortfolioScreen) Stop() {
+func (screen *TermuiPortfolioView) Stop() {
 	termui.StopLoop()
 	termui.Close()
 }
 
-func (screen *TermuiPortfolioScreen) Refresh(portifolio []model.PortfolioEntry, quotes []model.Quote) {}
+func (screen *TermuiPortfolioView) Refresh(portifolio []PortfolioEntry, quotes []Quote) {}
