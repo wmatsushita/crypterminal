@@ -15,6 +15,10 @@ type PortfolioEntry struct {
 	Amount     big.Float `json:"amount"`
 }
 
+type Portfolio struct {
+	entries []*PortfolioEntry
+}
+
 type Quote struct {
 	CurrencyId    string
 	Price         big.Float

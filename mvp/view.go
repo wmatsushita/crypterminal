@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func NewTermuiPortfolioScreen() *TermuiPortfolioView {
+func NewTermuiPortfolioView() *TermuiPortfolioView {
 	return &TermuiPortfolioView{
 		title:          createTitle(),
 		menu:           createMenu(),

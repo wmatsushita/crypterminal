@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"encoding/json"
@@ -10,24 +10,24 @@ import (
 )
 
 type (
-	PortfolioLoader interface {
+	PortfolioService interface {
 		Load() error
 		GetPortfolio() ([]*mvp.PortfolioEntry, error)
 		common.Observable
 	}
 
-	JsonFilePortfolioLoader struct {
+	JsonFilePortfolioService struct {
 		filePath   string
 		portfolio  []*mvp.PortfolioEntry
 		observable *common.EmptySignalObservable
 	}
 )
 
-func NewJsonFilePortfolioLoader(filePath string) (*JsonFilePortfolioLoader, error) {
+func NewJsonFilePortfolioService(filePath string) (*JsonFilePortfolioService, error) {
 	if !fileExists(filePath) {
 		return nil, common.NewError("The given portifolio file path does not exist.")
 	}
-	return &JsonFilePortfolioLoader{
+	return &JsonFilePortfolioService{
 		filePath:   filePath,
 		portfolio:  make([]*mvp.PortfolioEntry, 0),
 		observable: common.NewEmptySignalObservable(),
@@ -39,7 +39,7 @@ func fileExists(fileName string) bool {
 	return !os.IsNotExist(err)
 }
 
-func (loader *JsonFilePortfolioLoader) Load() error {
+func (loader *JsonFilePortfolioService) Load() error {
 	data, err := ioutil.ReadFile(loader.filePath)
 	if err != nil {
 		return common.NewErrorWithCause("Could not read portfolio file.", err)
@@ -53,7 +53,7 @@ func (loader *JsonFilePortfolioLoader) Load() error {
 	return nil
 }
 
-func (loader *JsonFilePortfolioLoader) GetPortfolio() ([]*mvp.PortfolioEntry, error) {
+func (loader *JsonFilePortfolioService) GetPortfolio() ([]*mvp.PortfolioEntry, error) {
 	if len(loader.portfolio) == 0 {
 		return nil, common.NewError("The portfolio was not loaded. Consider loading it first.")
 	}
@@ -61,14 +61,14 @@ func (loader *JsonFilePortfolioLoader) GetPortfolio() ([]*mvp.PortfolioEntry, er
 	return loader.portfolio, nil
 }
 
-func (loader *JsonFilePortfolioLoader) Subscribe() chan struct{} {
+func (loader *JsonFilePortfolioService) Subscribe() chan struct{} {
 	return loader.observable.Subscribe()
 }
 
-func (loader *JsonFilePortfolioLoader) Unsubscribe(subscription chan struct{}) {
+func (loader *JsonFilePortfolioService) Unsubscribe(subscription chan struct{}) {
 	loader.observable.Unsubscribe(subscription)
 }
 
-func (loader *JsonFilePortfolioLoader) Notify() {
+func (loader *JsonFilePortfolioService) Notify() {
 	loader.observable.Notify()
 }

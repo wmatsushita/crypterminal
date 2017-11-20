@@ -1,14 +1,14 @@
-package main
+package service
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
-func TestJsonPortfolioLoaderValidatesNonExistingFiles(t *testing.T) {
-	_, err := NewJsonFilePortfolioLoader("thisfiledoesnotexistforsure")
+func TestJsonPortfolioServiceValidatesNonExistingFiles(t *testing.T) {
+	_, err := NewJsonFilePortfolioService("thisfiledoesnotexistforsure")
 	if err == nil {
-		t.Error("NewJsonFilePortfolioLoader did not fail when given unexisting file path.")
+		t.Error("NewJsonFilePortfolioService did not fail when given unexisting file path.")
 	}
 }
 
@@ -27,7 +27,7 @@ func TestFileExistsValidation(t *testing.T) {
 func TestJsonPortfolioLoadsCorrectly(t *testing.T) {
 	fileName := "portfolio.json"
 
-	loader, err := NewJsonFilePortfolioLoader(fileName)
+	loader, err := NewJsonFilePortfolioService(fileName)
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,7 +42,7 @@ func TestJsonPortfolioLoadsCorrectly(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _,v := range portfolio {
+	for _, v := range portfolio {
 		if v.CurrencyId == "IOTA" {
 			iotaAmount := v.Amount.String()
 			fmt.Printf("IOTA Amount: %v\n", iotaAmount)
