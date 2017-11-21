@@ -6,20 +6,16 @@ import (
 	"os"
 
 	"github.com/wmatsushita/mycrypto/common"
-	"github.com/wmatsushita/mycrypto/mvp"
+	"github.com/wmatsushita/mycrypto/domain"
 )
 
 type (
 	PortfolioService interface {
-		Load() error
-		GetPortfolio() ([]*mvp.PortfolioEntry, error)
-		common.Observable
+		FetchPortfolio() (*domain.Portfolio, error)
 	}
 
 	JsonFilePortfolioService struct {
-		filePath   string
-		portfolio  []*mvp.PortfolioEntry
-		observable *common.EmptySignalObservable
+		filePath string
 	}
 )
 
@@ -28,9 +24,7 @@ func NewJsonFilePortfolioService(filePath string) (*JsonFilePortfolioService, er
 		return nil, common.NewError("The given portifolio file path does not exist.")
 	}
 	return &JsonFilePortfolioService{
-		filePath:   filePath,
-		portfolio:  make([]*mvp.PortfolioEntry, 0),
-		observable: common.NewEmptySignalObservable(),
+		filePath: filePath,
 	}, nil
 }
 
@@ -39,36 +33,28 @@ func fileExists(fileName string) bool {
 	return !os.IsNotExist(err)
 }
 
-func (loader *JsonFilePortfolioService) Load() error {
-	data, err := ioutil.ReadFile(loader.filePath)
+func loadFromFile(filePath string) ([]*domain.PortfolioEntry, error) {
+	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return common.NewErrorWithCause("Could not read portfolio file.", err)
+		return nil, common.NewErrorWithCause("Could not read portfolio file.", err)
 	}
 
-	err = json.Unmarshal(data, &loader.portfolio)
+	entries := make([]*domain.PortfolioEntry, 0)
+	err = json.Unmarshal(data, &entries)
 	if err != nil {
-		return common.NewErrorWithCause("Could not deserialize json portfolio", err)
+		return nil, common.NewErrorWithCause("Could not deserialize json portfolio", err)
 	}
 
-	return nil
+	return entries, nil
 }
 
-func (loader *JsonFilePortfolioService) GetPortfolio() ([]*mvp.PortfolioEntry, error) {
-	if len(loader.portfolio) == 0 {
-		return nil, common.NewError("The portfolio was not loaded. Consider loading it first.")
+func (loader *JsonFilePortfolioService) FetchPortfolio() (*domain.Portfolio, error) {
+	entries, err := loadFromFile(loader.filePath)
+	if err != nil {
+		return nil, err
 	}
 
-	return loader.portfolio, nil
-}
-
-func (loader *JsonFilePortfolioService) Subscribe() chan struct{} {
-	return loader.observable.Subscribe()
-}
-
-func (loader *JsonFilePortfolioService) Unsubscribe(subscription chan struct{}) {
-	loader.observable.Unsubscribe(subscription)
-}
-
-func (loader *JsonFilePortfolioService) Notify() {
-	loader.observable.Notify()
+	return &domain.Portfolio{
+		Entries: entries,
+	}, nil
 }

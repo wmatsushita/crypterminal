@@ -1,31 +1,33 @@
 package mvp
 
 import (
-	"math/big"
-	"time"
+	"github.com/wmatsushita/mycrypto/common"
 )
 
-type Currency struct {
-	Id   string
-	Name string
-}
+type (
+	PortfolioRow struct {
+		assetName    string
+		assetAmount  string
+		assetPrice   string
+		assetValue   string
+		valueChange  string
+		percentChant string
+	}
 
-type PortfolioEntry struct {
-	CurrencyId string    `json:"currency"`
-	Amount     big.Float `json:"amount"`
-}
+	PortfolioTable struct {
+		rows       []PortfolioRow
+		observable common.Observable
+	}
 
-type Portfolio struct {
-	entries []*PortfolioEntry
-}
+	Status struct {
+		msg        string
+		observable common.Observable
+	}
+)
 
-type Quote struct {
-	CurrencyId    string
-	Price         big.Float
-	Volume        big.Float
-	High          big.Float
-	Low           big.Float
-	Change        big.Float
-	PercentChange big.Float
-	Period        time.Duration
+func NewPortfolioTable() *PortfolioTable {
+	return &PortfolioTable{
+		rows:       make([]PortfolioRow, 0),
+		observable: common.NewEmptySignalObservable(),
+	}
 }

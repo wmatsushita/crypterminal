@@ -13,7 +13,7 @@ func TestJsonPortfolioServiceValidatesNonExistingFiles(t *testing.T) {
 }
 
 func TestFileExistsValidation(t *testing.T) {
-	fileName := "portfolio.json"
+	fileName := "../portfolio.json"
 	if !fileExists(fileName) {
 		t.Errorf("fileExists function returns false for existing file name (%v).", fileName)
 	}
@@ -25,24 +25,19 @@ func TestFileExistsValidation(t *testing.T) {
 }
 
 func TestJsonPortfolioLoadsCorrectly(t *testing.T) {
-	fileName := "portfolio.json"
+	fileName := "../portfolio.json"
 
 	loader, err := NewJsonFilePortfolioService(fileName)
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = loader.Load()
+	portfolio, err := loader.FetchPortfolio()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	portfolio, err := loader.GetPortfolio()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, v := range portfolio {
+	for _, v := range portfolio.Entries {
 		if v.CurrencyId == "IOTA" {
 			iotaAmount := v.Amount.String()
 			fmt.Printf("IOTA Amount: %v\n", iotaAmount)
