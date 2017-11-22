@@ -25,7 +25,7 @@ type Quote struct {
 	Volume        big.Float
 	High          big.Float
 	Low           big.Float
-	Change        big.Float
-	PercentChange big.Float
+	Change        string
+	PercentChange string
 	Period        time.Duration
 }
