@@ -1,4 +1,4 @@
 {
-  "quotesendpoint": "https://api.bitfinex.com/v2/tickers",
-  "symbolquerykey": "symbols"
+  "quote.endpoint": "https://api.bitfinex.com/v2/tickers",
+  "symbol.query.key": "symbols"
 }

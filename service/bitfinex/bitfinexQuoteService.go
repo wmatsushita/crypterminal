@@ -14,6 +14,8 @@ import (
 	"io"
 	"time"
 
+	"math/big"
+
 	"github.com/wmatsushita/mycrypto/common"
 	"github.com/wmatsushita/mycrypto/domain"
 )
@@ -56,14 +58,14 @@ func assembleQuoteRequest(symbols []string) (*http.Request, error) {
 	config := getConfig()
 	fmt.Println(config)
 
-	url, err := url.Parse(config.quotesEndpoint)
+	url, err := url.Parse(config.QuotesEndpoint)
 	if err != nil {
 		return nil, common.NewErrorWithCause("Could not assemble Bitfinex request.", err)
 	}
 
 	url.Scheme = "https"
 	query := url.Query()
-	query.Set(config.symbolQueryKey, strings.Join(symbols, ","))
+	query.Set(config.SymbolQueryKey, strings.Join(symbols, ","))
 	url.RawQuery = query.Encode()
 
 	return &http.Request{
@@ -102,29 +104,29 @@ func parseQuoteResponse(response *http.Response) ([]*domain.Quote, error) {
 		return nil, common.NewError(fmt.Sprintf("Received error response from Bitfinex: (%d)", response.StatusCode))
 	}
 
-	data := make([]*quoteResponseRow, 0)
+	data := make([][]interface{}, 0)
 	json.Unmarshal(body, &data)
 
-	quotes := make([]*domain.Quote, len(data))
-	for _, q := range data {
+	quotes := make([]*domain.Quote, 0)
+	for _, row := range data {
 		quote := &domain.Quote{}
 		quote.Period = time.Hour * 24
-		for i, col := range q.row {
+		for i, col := range row {
 			switch i {
 			case 0:
-				quote.CurrencyId = col
+				quote.CurrencyId = col.(string)
 			case 5:
-				quote.Change = col
+				convertToBigFloat(&quote.Change, col)
 			case 6:
-				quote.PercentChange = col
+				convertToBigFloat(&quote.PercentChange, col)
 			case 7:
-				quote.Price.Parse(col, 10)
+				convertToBigFloat(&quote.Price, col)
 			case 8:
-				quote.Volume.Parse(col, 10)
+				convertToBigFloat(&quote.Volume, col)
 			case 9:
-				quote.High.Parse(col, 10)
+				convertToBigFloat(&quote.High, col)
 			case 10:
-				quote.Low.Parse(col, 10)
+				convertToBigFloat(&quote.Low, col)
 			}
 		}
 		quotes = append(quotes, quote)
@@ -144,8 +146,11 @@ func readResponseBody(body io.ReadCloser) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-type quoteResponseRow struct {
-	row []string
+func convertToBigFloat(bigValue *big.Float, v interface{}) {
+	value, ok := v.(float64)
+	if ok {
+		bigValue.SetFloat64(value)
+	}
 }
 
 func errorResponse(msg string, err error) ([]*domain.Quote, error) {
