@@ -14,8 +14,6 @@ import (
 	"io"
 	"time"
 
-	"math/big"
-
 	"github.com/wmatsushita/mycrypto/common"
 	"github.com/wmatsushita/mycrypto/domain"
 )
@@ -34,9 +32,9 @@ func NewBitfinexQuoteService(c *http.Client) *BitfinexQuoteService {
 	}
 }
 
-func (s *BitfinexQuoteService) FetchQuotes(symbols []string) ([]*domain.Quote, error) {
+func (s *BitfinexQuoteService) FetchQuotes(currencyIds []string) (map[string]*domain.Quote, error) {
 
-	request, err := assembleQuoteRequest(symbols)
+	request, err := assembleQuoteRequest(convertFromCurrencyIdsToSymbols(currencyIds))
 	if err != nil {
 		return errorResponse(errorMsg, err)
 	}
@@ -46,12 +44,32 @@ func (s *BitfinexQuoteService) FetchQuotes(symbols []string) ([]*domain.Quote, e
 		return errorResponse(errorMsg, err)
 	}
 
-	quotes, err := parseQuoteResponse(response)
+	bodyBytes, err := readResponseBody(response.Body)
+	if err != nil {
+		return errorResponse("Could not parse response", err)
+	}
+
+	if response.StatusCode != 200 {
+		return nil, common.NewError(fmt.Sprintf("Received error response from Bitfinex: (%d)", response.StatusCode))
+	}
+
+	quotes, err := parseQuoteResponse(bodyBytes)
 	if err != nil {
 		return errorResponse(errorMsg, err)
 	}
 
 	return quotes, nil
+}
+
+func convertFromCurrencyIdsToSymbols(currencyIds []string) []string {
+	currencyToSymbol := getCurrencyToSymbolMap()
+	symbols := make([]string, 0, len(currencyIds))
+
+	for _, currencyId := range currencyIds {
+		symbols = append(symbols, currencyToSymbol[currencyId])
+	}
+
+	return symbols
 }
 
 func assembleQuoteRequest(symbols []string) (*http.Request, error) {
@@ -63,7 +81,6 @@ func assembleQuoteRequest(symbols []string) (*http.Request, error) {
 		return nil, common.NewErrorWithCause("Could not assemble Bitfinex request.", err)
 	}
 
-	url.Scheme = "https"
 	query := url.Query()
 	query.Set(config.SymbolQueryKey, strings.Join(symbols, ","))
 	url.RawQuery = query.Encode()
@@ -76,7 +93,7 @@ func assembleQuoteRequest(symbols []string) (*http.Request, error) {
 
 /*
 Bitfinex response for ticker endpoint is as follows: (Nasty!)
-[
+[, col)
 	[
 		SYMBOL,				0
 		BID,				1
@@ -93,43 +110,35 @@ Bitfinex response for ticker endpoint is as follows: (Nasty!)
 	...
 ]
 */
-func parseQuoteResponse(response *http.Response) ([]*domain.Quote, error) {
+func parseQuoteResponse(body []byte) (map[string]*domain.Quote, error) {
+	responseData := make([][]interface{}, 0)
+	json.Unmarshal(body, &responseData)
 
-	body, err := readResponseBody(response.Body)
-	if err != nil {
-		return errorResponse("Could not parse response", err)
-	}
+	quotes := make(map[string]*domain.Quote, 0)
 
-	if response.StatusCode != 200 {
-		return nil, common.NewError(fmt.Sprintf("Received error response from Bitfinex: (%d)", response.StatusCode))
-	}
-
-	data := make([][]interface{}, 0)
-	json.Unmarshal(body, &data)
-
-	quotes := make([]*domain.Quote, 0)
-	for _, row := range data {
+	for _, symbol := range responseData {
 		quote := &domain.Quote{}
 		quote.Period = time.Hour * 24
-		for i, col := range row {
+
+		for i, value := range symbol {
 			switch i {
 			case 0:
-				quote.CurrencyId = col.(string)
+				quote.CurrencyId = value.(string)
 			case 5:
-				convertToBigFloat(&quote.Change, col)
+				quote.Change = value.(float64)
 			case 6:
-				convertToBigFloat(&quote.PercentChange, col)
+				quote.PercentChange = value.(float64)
 			case 7:
-				convertToBigFloat(&quote.Price, col)
+				quote.Price = value.(float64)
 			case 8:
-				convertToBigFloat(&quote.Volume, col)
+				quote.Volume = value.(float64)
 			case 9:
-				convertToBigFloat(&quote.High, col)
+				quote.High = value.(float64)
 			case 10:
-				convertToBigFloat(&quote.Low, col)
+				quote.Low = value.(float64)
 			}
 		}
-		quotes = append(quotes, quote)
+		quotes[quote.CurrencyId] = quote
 	}
 
 	return quotes, nil
@@ -146,13 +155,6 @@ func readResponseBody(body io.ReadCloser) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func convertToBigFloat(bigValue *big.Float, v interface{}) {
-	value, ok := v.(float64)
-	if ok {
-		bigValue.SetFloat64(value)
-	}
-}
-
-func errorResponse(msg string, err error) ([]*domain.Quote, error) {
+func errorResponse(msg string, err error) (map[string]*domain.Quote, error) {
 	return nil, common.NewErrorWithCause(msg, err)
 }

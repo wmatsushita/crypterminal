@@ -1,4 +1,86 @@
 {
   "quote.endpoint": "https://api.bitfinex.com/v2/tickers",
-  "symbol.query.key": "symbols"
+  "symbol.query.key": "symbols",
+  "currency.symbol.map": [
+    {
+      "currency": "Aventus",
+      "symbol": "tAVTUSD"
+    },
+    {
+      "currency": "Bitcoin",
+      "symbol": "tBTCUSD"
+    },
+    {
+      "currency": "BitcoinCash",
+      "symbol": "tBCHUSD"
+    },
+    {
+      "currency": "BitcoinGold",
+      "symbol": "tBTGUSD"
+    },
+    {
+      "currency": "Dash",
+      "symbol": "tDSHUSD"
+    },
+    {
+      "currency": "Eos",
+      "symbol": "tEOSUSD"
+    },
+    {
+      "currency": "Eidoo",
+      "symbol": "tEDOUSD"
+    },
+    {
+      "currency": "Ethereum",
+      "symbol": "tETHUSD"
+    },
+    {
+      "currency": "EthereumClassic",
+      "symbol": "tETCUSD"
+    },
+    {
+      "currency": "Iota",
+      "symbol": "tIOTUSD"
+    },
+    {
+      "currency": "Litecoin",
+      "symbol": "tLTCUSD"
+    },
+    {
+      "currency": "MetaverseETP",
+      "symbol": "tETPUSD"
+    },
+    {
+      "currency": "Monero",
+      "symbol": "tXMRUSD"
+    },
+    {
+      "currency": "Neo",
+      "symbol": "tNEOUSD"
+    },
+    {
+      "currency": "OmiseGO",
+      "symbol": "tOMGUSD"
+    },
+    {
+      "currency": "Qtum",
+      "symbol": "tQTMUSD"
+    },
+    {
+      "currency": "Ripple",
+      "symbol": "tXRPUSD"
+    },
+    {
+      "currency": "Santiment",
+      "symbol": "tSANUSD"
+    },
+    {
+      "currency": "Streamr",
+      "symbol": "tDATUSD"
+    },
+    {
+      "currency": "Zcash",
+      "symbol": "tZECUSD"
+    }
+  ]
 }

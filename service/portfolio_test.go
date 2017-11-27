@@ -39,9 +39,9 @@ func TestJsonPortfolioLoadsCorrectly(t *testing.T) {
 
 	for _, v := range portfolio.Entries {
 		if v.CurrencyId == "IOTA" {
-			iotaAmount := v.Amount.String()
+			iotaAmount := fmt.Sprintf("%.4f", v.Amount)
 			fmt.Printf("IOTA Amount: %v\n", iotaAmount)
-			if iotaAmount != "20000" {
+			if iotaAmount != "20000.0000" {
 				t.Errorf("Iota amount difers from file content.")
 			}
 		}

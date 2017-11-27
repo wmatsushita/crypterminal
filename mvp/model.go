@@ -6,16 +6,16 @@ import (
 
 type (
 	PortfolioRow struct {
-		assetName    string
-		assetAmount  string
-		assetPrice   string
-		assetValue   string
-		valueChange  string
-		percentChant string
+		assetName     string
+		assetAmount   string
+		assetPrice    string
+		assetValue    string
+		valueChange   string
+		percentChange string
 	}
 
 	PortfolioTable struct {
-		rows       []PortfolioRow
+		rows       []*PortfolioRow
 		observable common.Observable
 	}
 
@@ -25,9 +25,11 @@ type (
 	}
 )
 
-func NewPortfolioTable() *PortfolioTable {
-	return &PortfolioTable{
-		rows:       make([]PortfolioRow, 0),
-		observable: common.NewEmptySignalObservable(),
-	}
+var thePortifolioTable = PortfolioTable{
+	rows:       make([]*PortfolioRow, 0),
+	observable: common.NewEmptySignalObservable(),
+}
+
+func GetPortfolioTable() *PortfolioTable {
+	return &thePortifolioTable
 }

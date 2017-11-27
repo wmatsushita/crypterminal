@@ -6,12 +6,13 @@ import (
 
 type (
 	PortfolioView interface {
-		Init()
+		Init(presenter Presenter)
+		Watch(table *PortfolioTable)
 		Quit()
-		Refresh(portifolio []PortfolioEntry, quotes []Quote)
 	}
 
 	TermuiPortfolioView struct {
+		presenter      Presenter
 		title          *termui.Par
 		menu           *termui.List
 		portfolioTable *termui.Table
@@ -28,7 +29,9 @@ func NewTermuiPortfolioView() *TermuiPortfolioView {
 	}
 }
 
-func (screen *TermuiPortfolioView) Init() {
+func (screen *TermuiPortfolioView) Init(presenter Presenter) {
+	screen.presenter = presenter
+
 	err := termui.Init()
 	if err != nil {
 		panic(err)
@@ -52,28 +55,26 @@ func (screen *TermuiPortfolioView) Init() {
 	// handle key q pressing
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
 		// press q to quit
-		screen.Stop()
+		presenter.ProcessUiEvent(Event{programQuit})
 	})
 
-	termui.Handle("/sys/kbd/C-x", func(termui.Event) {
-		// handle Ctrl + x combination
-	})
-
-	termui.Handle("/sys/kbd", func(termui.Event) {
-		// handle all other key pressing
-	})
-
-	// handle a 1s timer
-	termui.Handle("/timer/1s", func(e termui.Event) {
-		t := e.Data.(termui.EvtTimer)
-		// t is a EvtTimer
-		if t.Count%2 == 0 {
-			// do something
-		}
+	termui.Handle("/sys/kbd/r", func(termui.Event) {
+		// press q to quit
+		presenter.ProcessUiEvent(Event{portfolioRefresh})
 	})
 
 	go termui.Loop() // block until StopLoop is called
 }
+
+func (screen *TermuiPortfolioView) Watch(table *PortfolioTable) {
+	panic("implement me")
+}
+
+func (screen *TermuiPortfolioView) Quit() {
+	termui.StopLoop()
+	termui.Close()
+}
+
 func createStatusBar() *termui.Par {
 	statusBar := termui.NewPar("")
 	statusBar.Height = 3
@@ -116,10 +117,3 @@ func createTitle() *termui.Par {
 
 	return title
 }
-
-func (screen *TermuiPortfolioView) Stop() {
-	termui.StopLoop()
-	termui.Close()
-}
-
-func (screen *TermuiPortfolioView) Refresh(portifolio []PortfolioEntry, quotes []Quote) {}

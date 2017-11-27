@@ -3,7 +3,6 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/wmatsushita/mycrypto/common"
@@ -15,8 +14,8 @@ type Currency struct {
 }
 
 type PortfolioEntry struct {
-	CurrencyId string    `json:"currency"`
-	Amount     big.Float `json:"amount"`
+	CurrencyId string  `json:"currency"`
+	Amount     float64 `json:"amount"`
 }
 
 type Portfolio struct {
@@ -25,12 +24,12 @@ type Portfolio struct {
 
 type Quote struct {
 	CurrencyId    string
-	Price         big.Float
-	Volume        big.Float
-	High          big.Float
-	Low           big.Float
-	Change        big.Float
-	PercentChange big.Float
+	Price         float64
+	Volume        float64
+	High          float64
+	Low           float64
+	Change        float64
+	PercentChange float64
 	Period        time.Duration
 }
 
