@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 
+	"os"
+	"os/signal"
+
 	"github.com/wmatsushita/mycrypto/mvp"
 )
 
@@ -18,8 +21,21 @@ func main() {
 
 	flag.Parse()
 
-	screen := mvp.NewTermuiPortfolioView()
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
 
-	screen.Init()
+	view := mvp.NewTermuiPortfolioView()
+	quit := make(chan struct{}, 1)
+	presenter := mvp.NewPortfolioPresenter(view, quit)
+
+	presenter.Init()
+
+	select {
+	case <-interrupt:
+		presenter.Quit()
+		return
+	case <-quit:
+		return
+	}
 
 }

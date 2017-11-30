@@ -16,6 +16,13 @@ type (
 	}
 
 	/*
+		Observer that subscribes to an observable and executes given func onNotify when signal is received.
+	*/
+	Observer interface {
+		Watch(observable Observable, onNotify func()) chan struct{}
+		Ignore(observable Observable, signals chan struct{})
+	}
+	/*
 		Observable that signals empty messages.
 		The meaning of the signal depends on the use and must be known by the Observer.
 		Usually means that the Observable has changed and the Observer must fetch it's current state.
@@ -23,7 +30,28 @@ type (
 	EmptySignalObservable struct {
 		Subscriptions sets.Set
 	}
+
+	EmptySignalObserver struct{}
 )
+
+func NewEmptySignalObserver() *EmptySignalObserver {
+	return &EmptySignalObserver{}
+}
+
+func (o *EmptySignalObserver) Watch(observable Observable, onNotify func()) chan struct{} {
+	signals := observable.Subscribe()
+	go func(action func()) {
+		for range signals {
+			action()
+		}
+	}(onNotify)
+
+	return signals
+}
+
+func (o *EmptySignalObserver) Ignore(observable Observable, signals chan struct{}) {
+	observable.Unsubscribe(signals)
+}
 
 func NewEmptySignalObservable() *EmptySignalObservable {
 	return &EmptySignalObservable{
@@ -40,6 +68,7 @@ func (o *EmptySignalObservable) Subscribe() chan struct{} {
 
 func (o *EmptySignalObservable) Unsubscribe(subscription chan struct{}) {
 	o.Subscriptions.Remove(subscription)
+	close(subscription)
 }
 
 func (o *EmptySignalObservable) Notify() {

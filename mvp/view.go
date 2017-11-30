@@ -1,13 +1,15 @@
 package mvp
 
 import (
+	"fmt"
+
 	"github.com/gizak/termui"
+	"github.com/wmatsushita/mycrypto/common"
 )
 
 type (
 	PortfolioView interface {
 		Init(presenter Presenter)
-		Watch(table *PortfolioTable)
 		Quit()
 	}
 
@@ -17,6 +19,9 @@ type (
 		menu           *termui.List
 		portfolioTable *termui.Table
 		statusBar      *termui.Par
+		observer       common.Observer
+		tableSignals   chan struct{}
+		statusSignals  chan struct{}
 	}
 )
 
@@ -26,51 +31,74 @@ func NewTermuiPortfolioView() *TermuiPortfolioView {
 		menu:           createMenu(),
 		portfolioTable: createPortfolioTable(),
 		statusBar:      createStatusBar(),
+		observer:       common.NewEmptySignalObserver(),
 	}
 }
 
-func (screen *TermuiPortfolioView) Init(presenter Presenter) {
-	screen.presenter = presenter
+func (view *TermuiPortfolioView) Init(presenter Presenter) {
+	view.presenter = presenter
 
 	err := termui.Init()
 	if err != nil {
 		panic(err)
 	}
 
-	termui.Body.AddRows(
-		termui.NewRow(
-			termui.NewCol(10, 0, screen.title),
-			termui.NewCol(2, 0, screen.menu)),
-		termui.NewRow(
-			termui.NewCol(12, 0, screen.portfolioTable),
-		),
-		termui.NewRow(
-			termui.NewCol(12, 0, screen.statusBar)))
+	view.layout()
+	view.eventHandling()
 
-	// calculate layout
-	termui.Body.Align()
+	portfolioTable := GetPortfolioTable()
+	status := GetStatus()
+	view.tableSignals = view.observer.Watch(portfolioTable.observable, view.refreshPortfolioTable)
+	view.statusSignals = view.observer.Watch(status.observable, view.refreshStatus)
 
-	termui.Render(termui.Body)
+}
 
+func (view *TermuiPortfolioView) refreshPortfolioTable() {
+	data := GetPortfolioTable()
+	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value", "Daily Change "}}
+	for _, row := range data.rows {
+		view.portfolioTable.Rows = append(view.portfolioTable.Rows,
+			[]string{row.assetName, row.assetAmount, row.assetPrice, row.assetValue, fmt.Sprintf("%s (%s)", row.valueChange, row.percentChange)})
+	}
+}
+
+func (view *TermuiPortfolioView) refreshStatus() {
+	status := GetStatus()
+	view.statusBar.Text = status.msg
+}
+
+func (view *TermuiPortfolioView) eventHandling() {
 	// handle key q pressing
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
 		// press q to quit
-		presenter.ProcessUiEvent(Event{programQuit})
+		view.presenter.ProcessUiEvent(Event{programQuit})
 	})
-
 	termui.Handle("/sys/kbd/r", func(termui.Event) {
 		// press q to quit
-		presenter.ProcessUiEvent(Event{portfolioRefresh})
+		view.presenter.ProcessUiEvent(Event{portfolioRefresh})
 	})
 
 	go termui.Loop() // block until StopLoop is called
 }
 
-func (screen *TermuiPortfolioView) Watch(table *PortfolioTable) {
-	panic("implement me")
+func (view *TermuiPortfolioView) layout() {
+	termui.Body.AddRows(
+		termui.NewRow(
+			termui.NewCol(10, 0, view.title),
+			termui.NewCol(2, 0, view.menu)),
+		termui.NewRow(
+			termui.NewCol(12, 0, view.portfolioTable),
+		),
+		termui.NewRow(
+			termui.NewCol(12, 0, view.statusBar)))
+	// calculate layout
+	termui.Body.Align()
+	termui.Render(termui.Body)
 }
 
-func (screen *TermuiPortfolioView) Quit() {
+func (view *TermuiPortfolioView) Quit() {
+	view.observer.Ignore(GetPortfolioTable().observable, view.tableSignals)
+	view.observer.Ignore(GetStatus().observable, view.statusSignals)
 	termui.StopLoop()
 	termui.Close()
 }
@@ -82,6 +110,7 @@ func createStatusBar() *termui.Par {
 	statusBar.BorderLabel = "Status"
 	return statusBar
 }
+
 func createPortfolioTable() *termui.Table {
 	tableData := [][]string{
 		{"Currency", "Ammount", "Price", "Daily Change"},
@@ -96,6 +125,7 @@ func createPortfolioTable() *termui.Table {
 
 	return table
 }
+
 func createMenu() *termui.List {
 	strs := []string{
 		"[q] Quit",
@@ -109,6 +139,7 @@ func createMenu() *termui.List {
 
 	return menu
 }
+
 func createTitle() *termui.Par {
 	title := termui.NewPar(" \n   $$ MyCrypto Portifolio Ticker $$ ")
 	title.Height = 5

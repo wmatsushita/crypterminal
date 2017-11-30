@@ -23,12 +23,20 @@ type (
 	}
 )
 
+func NewPortfolioPresenter(view PortfolioView, quit chan struct{}) *PortfolioPresenter {
+	return &PortfolioPresenter{
+		view,
+		quit,
+	}
+}
+
 func (p *PortfolioPresenter) Init() {
-	panic("implement me")
+	p.view.Init(p)
 }
 
 func (p *PortfolioPresenter) Quit() {
 	p.view.Quit()
+	close(p.quit)
 }
 
 func (p *PortfolioPresenter) ProcessUiEvent(event Event) {

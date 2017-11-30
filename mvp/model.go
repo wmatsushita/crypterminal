@@ -25,11 +25,21 @@ type (
 	}
 )
 
-var thePortifolioTable = PortfolioTable{
-	rows:       make([]*PortfolioRow, 0),
-	observable: common.NewEmptySignalObservable(),
-}
+var (
+	thePortifolioTable = PortfolioTable{
+		rows:       make([]*PortfolioRow, 0),
+		observable: common.NewEmptySignalObservable(),
+	}
+
+	theStatus = Status{
+		observable: common.NewEmptySignalObservable(),
+	}
+)
 
 func GetPortfolioTable() *PortfolioTable {
 	return &thePortifolioTable
+}
+
+func GetStatus() *Status {
+	return &theStatus
 }
