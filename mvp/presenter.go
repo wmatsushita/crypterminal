@@ -12,6 +12,7 @@ import (
 const (
 	FLOAT_FORMAT_STRING string        = "%.4f"
 	TICK_INTERVAL       time.Duration = 10 * time.Second
+	DATE_FORMAT         string        = "15:04:05"
 )
 
 var (
@@ -67,9 +68,14 @@ func initializeTicker(p *PortfolioPresenter) {
 
 func (p *PortfolioPresenter) refreshQuotes() {
 	p.setStatusMessage("Updating quotes...")
-	quotes := p.fetchQuotesForPortfolio()
+	quotes, err := p.fetchQuotesForPortfolio()
+	if err != nil {
+		p.setStatusMessage("Failed to fetch quotes from server")
+		return
+	}
+
 	p.fillPortfolioTable(portfolio, quotes)
-	p.setStatusMessage("")
+	p.setStatusMessage(fmt.Sprintf("Last update: %v", time.Now().Format(DATE_FORMAT)))
 }
 
 func (p *PortfolioPresenter) reloadPortfolio() {
@@ -81,20 +87,24 @@ func (p *PortfolioPresenter) reloadPortfolio() {
 		p.setStatusMessage(fmt.Sprintf("Error reloading portfolio: %s", err))
 	}
 
-	quotes := p.fetchQuotesForPortfolio()
+	quotes, err := p.fetchQuotesForPortfolio()
+
+	if err != nil {
+		p.setStatusMessage("Failed fetching quotes from server")
+		return
+	}
 
 	p.fillPortfolioTable(portfolio, quotes)
-
-	p.setStatusMessage("")
+	p.setStatusMessage(fmt.Sprintf("Last update: %v", time.Now().Format(DATE_FORMAT)))
 }
 
-func (p *PortfolioPresenter) fetchQuotesForPortfolio() map[string]*domain.Quote {
+func (p *PortfolioPresenter) fetchQuotesForPortfolio() (map[string]*domain.Quote, error) {
 	currencies := extractCurrencies(portfolio)
 	quotes, err := p.quoteService.FetchQuotes(currencies)
 	if err != nil {
-		p.setStatusMessage(fmt.Sprintf("Error: %s", err))
+		return nil, err
 	}
-	return quotes
+	return quotes, nil
 }
 
 func extractCurrencies(portfolio *domain.Portfolio) []string {

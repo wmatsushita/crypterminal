@@ -36,13 +36,15 @@ func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	view := mvp.NewTermuiPortfolioView()
 	portfolioService, err := service.NewJsonFilePortfolioService(portfolioFlag)
 	if err != nil {
 		log.Panicf("Error creating JsonFilePortfolioServcie: %s", err)
 	}
 	quoteService := bitfinex.NewBitfinexQuoteService(httpClient)
+
 	quit := make(chan struct{}, 1)
+
+	view := mvp.NewTermuiPortfolioView()
 	presenter := mvp.NewPortfolioPresenter(view, quoteService, portfolioService, quit)
 
 	presenter.Init()

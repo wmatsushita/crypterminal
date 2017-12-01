@@ -49,7 +49,6 @@ func (view *TermuiPortfolioView) Init(presenter Presenter) {
 
 	view.tableSignals = view.observer.Watch(GetPortfolioTable().Observable, view.refreshPortfolioTable)
 	view.statusSignals = view.observer.Watch(GetStatus().Observable, view.refreshStatus)
-
 }
 
 func (view *TermuiPortfolioView) refreshPortfolioTable() {
@@ -143,7 +142,7 @@ func createMenu() *termui.List {
 }
 
 func createTitle() *termui.Par {
-	title := termui.NewPar(" \n   $$ MyCrypto Portifolio Ticker $$ ")
+	title := termui.NewPar(" \n   $$ MyCrypto Portfolio Ticker $$ ")
 	title.Height = 5
 	title.TextFgColor = termui.ColorGreen
 	title.BorderFg = termui.ColorCyan
