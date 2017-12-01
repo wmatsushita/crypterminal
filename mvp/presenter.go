@@ -11,7 +11,7 @@ import (
 
 const (
 	FLOAT_FORMAT_STRING string        = "%.4f"
-	TICK_INTERVAL       time.Duration = 5 * time.Second
+	TICK_INTERVAL       time.Duration = 10 * time.Second
 )
 
 var (
@@ -136,7 +136,7 @@ func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quo
 			AssetPrice:    formatValue(quote.Price),
 			AssetValue:    formatValue(entry.Amount * quote.Price),
 			ValueChange:   formatValue(quote.Change),
-			PercentChange: formatValue(quote.PercentChange),
+			PercentChange: formatValue(quote.PercentChange * 100),
 		}
 		table.Rows = append(table.Rows, row)
 		totalValue += entry.Amount * quote.Price

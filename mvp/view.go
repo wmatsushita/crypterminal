@@ -1,8 +1,6 @@
 package mvp
 
 import (
-	"fmt"
-
 	"time"
 
 	"github.com/gizak/termui"
@@ -56,11 +54,11 @@ func (view *TermuiPortfolioView) Init(presenter Presenter) {
 
 func (view *TermuiPortfolioView) refreshPortfolioTable() {
 	data := GetPortfolioTable()
-	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Daily Change"}}
+	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
 
 	for _, row := range data.Rows {
 		view.portfolioTable.Rows = append(view.portfolioTable.Rows,
-			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, fmt.Sprintf("%s (%s)", row.ValueChange, row.PercentChange)})
+			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, row.ValueChange, row.PercentChange})
 	}
 
 	termui.Render(termui.Body)
@@ -89,8 +87,8 @@ func (view *TermuiPortfolioView) eventHandling() {
 func (view *TermuiPortfolioView) layout() {
 	termui.Body.AddRows(
 		termui.NewRow(
-			termui.NewCol(10, 0, view.title),
-			termui.NewCol(2, 0, view.menu)),
+			termui.NewCol(8, 0, view.title),
+			termui.NewCol(4, 0, view.menu)),
 		termui.NewRow(
 			termui.NewCol(12, 0, view.portfolioTable),
 		),
@@ -117,8 +115,8 @@ func createStatusBar() *termui.Par {
 }
 
 func createPortfolioTable() *termui.Table {
-	tableData := [][]string{
-		{"Currency", "Ammount", "Price", "Daily Change"}}
+	tableData := [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
+
 	table := termui.NewTable()
 	table.Rows = tableData
 	table.BorderLabel = "Portfolio"
