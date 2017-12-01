@@ -74,7 +74,6 @@ func convertFromCurrencyIdsToSymbols(currencyIds []string) []string {
 
 func assembleQuoteRequest(symbols []string) (*http.Request, error) {
 	config := getConfig()
-	fmt.Println(config)
 
 	url, err := url.Parse(config.QuotesEndpoint)
 	if err != nil {
@@ -116,6 +115,8 @@ func parseQuoteResponse(body []byte) (map[string]*domain.Quote, error) {
 
 	quotes := make(map[string]*domain.Quote, 0)
 
+	symbolToCurrency := getSymbolToCurrencyMap()
+
 	for _, symbol := range responseData {
 		quote := &domain.Quote{}
 		quote.Period = time.Hour * 24
@@ -123,7 +124,7 @@ func parseQuoteResponse(body []byte) (map[string]*domain.Quote, error) {
 		for i, value := range symbol {
 			switch i {
 			case 0:
-				quote.CurrencyId = value.(string)
+				quote.CurrencyId = symbolToCurrency[value.(string)]
 			case 5:
 				quote.Change = value.(float64)
 			case 6:

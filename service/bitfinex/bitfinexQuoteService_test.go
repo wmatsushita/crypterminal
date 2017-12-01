@@ -7,13 +7,17 @@ import (
 )
 
 func TestBitfinexQuoteService_FetchQuotes(t *testing.T) {
-	symbols := []string{"tBTCUSD", "tLTCUSD", "tIOTUSD"}
+	currencies := []string{"Bitcoin", "Litecoin", "Iota"}
 
 	service := NewBitfinexQuoteService(&http.Client{})
 
-	quotes, err := service.FetchQuotes(symbols)
+	quotes, err := service.FetchQuotes(currencies)
 	if err != nil {
 		t.Errorf("Fetch quotes returned error: %v", err)
+	}
+
+	if len(quotes) < 3 {
+		t.Fatalf("Bitfinex response does not contain expected quotes")
 	}
 
 	for currency, quote := range quotes {

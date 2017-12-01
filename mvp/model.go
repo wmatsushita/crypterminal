@@ -6,33 +6,33 @@ import (
 
 type (
 	PortfolioRow struct {
-		assetName     string
-		assetAmount   string
-		assetPrice    string
-		assetValue    string
-		valueChange   string
-		percentChange string
+		AssetName     string
+		AssetAmount   string
+		AssetPrice    string
+		AssetValue    string
+		ValueChange   string
+		PercentChange string
 	}
 
 	PortfolioTable struct {
-		rows       []*PortfolioRow
-		observable common.Observable
+		Rows       []*PortfolioRow
+		Observable common.Observable
 	}
 
 	Status struct {
-		msg        string
-		observable common.Observable
+		Msg        string
+		Observable common.Observable
 	}
 )
 
 var (
 	thePortifolioTable = PortfolioTable{
-		rows:       make([]*PortfolioRow, 0),
-		observable: common.NewEmptySignalObservable(),
+		Rows:       make([]*PortfolioRow, 0),
+		Observable: common.NewEmptySignalObservable(),
 	}
 
 	theStatus = Status{
-		observable: common.NewEmptySignalObservable(),
+		Observable: common.NewEmptySignalObservable(),
 	}
 )
 

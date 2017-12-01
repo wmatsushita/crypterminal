@@ -3,6 +3,8 @@ package mvp
 import (
 	"fmt"
 
+	"time"
+
 	"github.com/gizak/termui"
 	"github.com/wmatsushita/mycrypto/common"
 )
@@ -22,6 +24,7 @@ type (
 		observer       common.Observer
 		tableSignals   chan struct{}
 		statusSignals  chan struct{}
+		ticker         chan time.Time
 	}
 )
 
@@ -46,25 +49,27 @@ func (view *TermuiPortfolioView) Init(presenter Presenter) {
 	view.layout()
 	view.eventHandling()
 
-	portfolioTable := GetPortfolioTable()
-	status := GetStatus()
-	view.tableSignals = view.observer.Watch(portfolioTable.observable, view.refreshPortfolioTable)
-	view.statusSignals = view.observer.Watch(status.observable, view.refreshStatus)
+	view.tableSignals = view.observer.Watch(GetPortfolioTable().Observable, view.refreshPortfolioTable)
+	view.statusSignals = view.observer.Watch(GetStatus().Observable, view.refreshStatus)
 
 }
 
 func (view *TermuiPortfolioView) refreshPortfolioTable() {
 	data := GetPortfolioTable()
-	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value", "Daily Change "}}
-	for _, row := range data.rows {
+	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Daily Change"}}
+
+	for _, row := range data.Rows {
 		view.portfolioTable.Rows = append(view.portfolioTable.Rows,
-			[]string{row.assetName, row.assetAmount, row.assetPrice, row.assetValue, fmt.Sprintf("%s (%s)", row.valueChange, row.percentChange)})
+			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, fmt.Sprintf("%s (%s)", row.ValueChange, row.PercentChange)})
 	}
+
+	termui.Render(termui.Body)
 }
 
 func (view *TermuiPortfolioView) refreshStatus() {
 	status := GetStatus()
-	view.statusBar.Text = status.msg
+	view.statusBar.Text = status.Msg
+	termui.Render(termui.Body)
 }
 
 func (view *TermuiPortfolioView) eventHandling() {
@@ -97,8 +102,8 @@ func (view *TermuiPortfolioView) layout() {
 }
 
 func (view *TermuiPortfolioView) Quit() {
-	view.observer.Ignore(GetPortfolioTable().observable, view.tableSignals)
-	view.observer.Ignore(GetStatus().observable, view.statusSignals)
+	view.observer.Ignore(GetPortfolioTable().Observable, view.tableSignals)
+	view.observer.Ignore(GetStatus().Observable, view.statusSignals)
 	termui.StopLoop()
 	termui.Close()
 }
@@ -113,14 +118,13 @@ func createStatusBar() *termui.Par {
 
 func createPortfolioTable() *termui.Table {
 	tableData := [][]string{
-		{"Currency", "Ammount", "Price", "Daily Change"},
-		{"Iota", "####", "$ ####.##", "100 %"}}
+		{"Currency", "Ammount", "Price", "Daily Change"}}
 	table := termui.NewTable()
 	table.Rows = tableData
 	table.BorderLabel = "Portfolio"
 	table.FgColor = termui.ColorWhite
 	table.BgColor = termui.ColorDefault
-	table.Height = 7
+	table.Height = 30
 	table.Border = true
 
 	return table

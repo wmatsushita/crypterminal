@@ -34,11 +34,17 @@ func fileExists(fileName string) bool {
 func (loader *JsonFilePortfolioService) FetchPortfolio() (*domain.Portfolio, error) {
 	entries := make([]*domain.PortfolioEntry, 0)
 	err := common.LoadFromJsonFile(loader.filePath, &entries)
+	filteredEntries := make([]*domain.PortfolioEntry, 0)
+	for _, entry := range entries {
+		if entry.Amount > 0 {
+			filteredEntries = append(filteredEntries, entry)
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 
 	return &domain.Portfolio{
-		Entries: entries,
+		Entries: filteredEntries,
 	}, nil
 }
