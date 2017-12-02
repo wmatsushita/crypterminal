@@ -60,6 +60,8 @@ func (view *TermuiPortfolioView) refreshPortfolioTable() {
 			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, row.ValueChange, row.PercentChange})
 	}
 
+	view.portfolioTable.BgColors[len(data.Rows)] = termui.ColorBlue
+
 	termui.Render(termui.Body)
 }
 
@@ -123,6 +125,9 @@ func createPortfolioTable() *termui.Table {
 	table.BgColor = termui.ColorDefault
 	table.Height = 30
 	table.Border = true
+	table.FgColors = make([]termui.Attribute, 30)
+	table.BgColors = make([]termui.Attribute, 30)
+	table.FgColors[0] = termui.ColorCyan
 
 	return table
 }

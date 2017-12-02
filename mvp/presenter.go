@@ -10,9 +10,13 @@ import (
 )
 
 const (
-	FLOAT_FORMAT_STRING string        = "%.4f"
-	TICK_INTERVAL       time.Duration = 10 * time.Second
-	DATE_FORMAT         string        = "15:04:05"
+	FLOAT_FORMAT_STRING   string        = "%.4f"
+	DOLAR_FORMAT_STRING   string        = "U$ %.2f"
+	PERCENT_FORMAT_STRING string        = "%.2f %%"
+	TICK_INTERVAL         time.Duration = 10 * time.Second
+	DATE_FORMAT           string        = "15:04:05"
+	ARROW_UP              string        = "\u2191"
+	ARROW_DOWN            string        = "\u2193"
 )
 
 var (
@@ -142,11 +146,11 @@ func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quo
 		quote := quotes[entry.CurrencyId]
 		row := &PortfolioRow{
 			AssetName:     entry.CurrencyId,
-			AssetAmount:   formatValue(entry.Amount),
-			AssetPrice:    formatValue(quote.Price),
-			AssetValue:    formatValue(entry.Amount * quote.Price),
-			ValueChange:   formatValue(quote.Change),
-			PercentChange: formatValue(quote.PercentChange * 100),
+			AssetAmount:   formatValue(FLOAT_FORMAT_STRING, entry.Amount),
+			AssetPrice:    formatValue(DOLAR_FORMAT_STRING, quote.Price),
+			AssetValue:    formatValue(DOLAR_FORMAT_STRING, entry.Amount*quote.Price),
+			ValueChange:   formatChange(DOLAR_FORMAT_STRING, quote.Change),
+			PercentChange: formatChange(PERCENT_FORMAT_STRING, quote.PercentChange*100),
 		}
 		table.Rows = append(table.Rows, row)
 		totalValue += entry.Amount * quote.Price
@@ -154,7 +158,7 @@ func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quo
 
 	totalRow := &PortfolioRow{
 		AssetName:  "Total Portfolio Value:",
-		AssetValue: formatValue(totalValue),
+		AssetValue: formatValue(DOLAR_FORMAT_STRING, totalValue),
 	}
 	table.Rows = append(table.Rows, totalRow)
 
@@ -162,6 +166,14 @@ func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quo
 	table.Observable.Notify()
 }
 
-func formatValue(value float64) string {
-	return fmt.Sprintf(FLOAT_FORMAT_STRING, value)
+func formatValue(format string, value float64) string {
+	return fmt.Sprintf(format, value)
+}
+
+func formatChange(format string, change float64) string {
+	if change > 0.0 {
+		return ARROW_UP + " " + formatValue(format, change)
+	} else {
+		return ARROW_DOWN + " " + formatValue(format, change)
+	}
 }
