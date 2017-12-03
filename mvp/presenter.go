@@ -15,8 +15,8 @@ const (
 	PERCENT_FORMAT_STRING string        = "%.2f %%"
 	TICK_INTERVAL         time.Duration = 10 * time.Second
 	DATE_FORMAT           string        = "15:04:05"
-	ARROW_UP              string        = "\u2191"
-	ARROW_DOWN            string        = "\u2193"
+	ARROW_UP              string        = "\u21E7"
+	ARROW_DOWN            string        = "\u21E9"
 )
 
 var (

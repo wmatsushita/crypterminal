@@ -55,9 +55,10 @@ func (view *TermuiPortfolioView) refreshPortfolioTable() {
 	data := GetPortfolioTable()
 	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
 
-	for _, row := range data.Rows {
+	for i, row := range data.Rows {
 		view.portfolioTable.Rows = append(view.portfolioTable.Rows,
 			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, row.ValueChange, row.PercentChange})
+		view.portfolioTable.BgColors[i+1] = view.portfolioTable.BgColor
 	}
 
 	view.portfolioTable.BgColors[len(data.Rows)] = termui.ColorBlue
@@ -135,7 +136,7 @@ func createPortfolioTable() *termui.Table {
 func createMenu() *termui.List {
 	strs := []string{
 		"[q] Quit",
-		"[r] Reload portfolio input",
+		"[r] Reload portfolio",
 	}
 	menu := termui.NewList()
 	menu.Items = strs
