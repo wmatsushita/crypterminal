@@ -11,9 +11,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/wmatsushita/mycrypto/mvp"
-	"github.com/wmatsushita/mycrypto/service"
-	"github.com/wmatsushita/mycrypto/service/bitfinex"
+	"github.com/wmatsushita/crypterminal/mvp"
+	"github.com/wmatsushita/crypterminal/service"
+	"github.com/wmatsushita/crypterminal/service/bitfinex"
 )
 
 var (

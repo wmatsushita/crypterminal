@@ -3,7 +3,7 @@ package bitfinex
 import (
 	"log"
 
-	"github.com/wmatsushita/mycrypto/common"
+	"github.com/wmatsushita/crypterminal/common"
 )
 
 var (

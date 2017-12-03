@@ -3,8 +3,8 @@ package service
 import (
 	"os"
 
-	"github.com/wmatsushita/mycrypto/common"
-	"github.com/wmatsushita/mycrypto/domain"
+	"github.com/wmatsushita/crypterminal/common"
+	"github.com/wmatsushita/crypterminal/domain"
 )
 
 type (
