@@ -7,11 +7,11 @@ import (
 type (
 	PortfolioRow struct {
 		AssetName     string
-		AssetAmount   string
-		AssetPrice    string
-		AssetValue    string
-		ValueChange   string
-		PercentChange string
+		AssetAmount   float64
+		AssetPrice    float64
+		AssetValue    float64
+		ValueChange   float64
+		PercentChange float64
 	}
 
 	PortfolioTable struct {
