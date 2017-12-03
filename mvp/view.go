@@ -3,8 +3,18 @@ package mvp
 import (
 	"time"
 
+	"fmt"
+
 	"github.com/gizak/termui"
 	"github.com/wmatsushita/mycrypto/common"
+)
+
+const (
+	amountFormatString  string = "%.4f"
+	moneyFormatString   string = "$ %.2f"
+	percentFormatString string = "%.2f %%"
+	arrowUp             string = "\u21E7"
+	arrowDown           string = "\u21E9"
 )
 
 type (
@@ -55,15 +65,43 @@ func (view *TermuiPortfolioView) refreshPortfolioTable() {
 	data := GetPortfolioTable()
 	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
 
-	for i, row := range data.Rows {
+	totalValue, totalValueChange := 0.0, 0.0
+	for _, row := range data.Rows {
 		view.portfolioTable.Rows = append(view.portfolioTable.Rows,
-			[]string{row.AssetName, row.AssetAmount, row.AssetPrice, row.AssetValue, row.ValueChange, row.PercentChange})
-		view.portfolioTable.BgColors[i+1] = view.portfolioTable.BgColor
+			[]string{
+				row.AssetName,
+				formatValue(amountFormatString, row.AssetAmount),
+				formatValue(moneyFormatString, row.AssetPrice),
+				formatValue(moneyFormatString, row.AssetValue),
+				formatChange(moneyFormatString, row.ValueChange),
+				formatChange(percentFormatString, row.PercentChange),
+			})
+		totalValue += row.AssetValue
+		totalValueChange += row.AssetValue * row.PercentChange / 100
 	}
 
-	view.portfolioTable.BgColors[len(data.Rows)] = termui.ColorBlue
+	// Reset table row bgcolor to default
+	for i := range view.portfolioTable.BgColors {
+		view.portfolioTable.BgColors[i] = view.portfolioTable.BgColor
+	}
+
+	view.summaryRow(totalValueChange, totalValue)
 
 	termui.Render(termui.Body)
+}
+
+func (view *TermuiPortfolioView) summaryRow(totalValueChange float64, totalValue float64) {
+	totalPercentChange := totalValueChange / totalValue * 100
+	view.portfolioTable.Rows = append(view.portfolioTable.Rows,
+		[]string{
+			"Total Portfolio Value",
+			"", "",
+			formatValue(moneyFormatString, totalValue),
+			formatChange(moneyFormatString, totalValueChange),
+			formatChange(percentFormatString, totalPercentChange),
+		})
+	// Set table last row (summary) bgcolor
+	view.portfolioTable.BgColors[len(view.portfolioTable.Rows)-1] = termui.ColorBlue
 }
 
 func (view *TermuiPortfolioView) refreshStatus() {
@@ -154,4 +192,16 @@ func createTitle() *termui.Par {
 	title.BorderFg = termui.ColorCyan
 
 	return title
+}
+
+func formatValue(format string, value float64) string {
+	return fmt.Sprintf(format, value)
+}
+
+func formatChange(format string, change float64) string {
+	if change > 0.0 {
+		return arrowUp + " " + formatValue(format, change)
+	} else {
+		return arrowDown + " " + formatValue(format, change)
+	}
 }

@@ -10,13 +10,8 @@ import (
 )
 
 const (
-	FLOAT_FORMAT_STRING   string        = "%.4f"
-	DOLAR_FORMAT_STRING   string        = "U$ %.2f"
-	PERCENT_FORMAT_STRING string        = "%.2f %%"
-	TICK_INTERVAL         time.Duration = 10 * time.Second
-	DATE_FORMAT           string        = "15:04:05"
-	ARROW_UP              string        = "\u21E7"
-	ARROW_DOWN            string        = "\u21E9"
+	tickInterval time.Duration = 10 * time.Second
+	dateFormat   string        = "15:04:05"
 )
 
 var (
@@ -36,6 +31,8 @@ type (
 		quoteService     service.QuoteService
 		portfolioService service.PortfolioService
 		quit             chan struct{}
+		updated          bool
+		lastUpdate       time.Time
 	}
 )
 
@@ -50,6 +47,8 @@ func NewPortfolioPresenter(
 		quoteService,
 		portfolioService,
 		quit,
+		false,
+		time.Now(),
 	}
 }
 
@@ -62,7 +61,7 @@ func (p *PortfolioPresenter) Init() {
 }
 
 func initializeTicker(p *PortfolioPresenter) {
-	ticker = time.Tick(TICK_INTERVAL)
+	ticker = time.Tick(tickInterval)
 	go func(t <-chan time.Time) {
 		for range t {
 			p.refreshQuotes()
@@ -72,14 +71,7 @@ func initializeTicker(p *PortfolioPresenter) {
 
 func (p *PortfolioPresenter) refreshQuotes() {
 	p.setStatusMessage("Updating quotes...")
-	quotes, err := p.fetchQuotesForPortfolio()
-	if err != nil {
-		p.setStatusMessage("Failed to fetch quotes from server")
-		return
-	}
-
-	p.fillPortfolioTable(portfolio, quotes)
-	p.setStatusMessage(fmt.Sprintf("Last update: %v", time.Now().Format(DATE_FORMAT)))
+	p.fetchAndUpdateQuotes()
 }
 
 func (p *PortfolioPresenter) reloadPortfolio() {
@@ -91,15 +83,28 @@ func (p *PortfolioPresenter) reloadPortfolio() {
 		p.setStatusMessage(fmt.Sprintf("Error reloading portfolio: %s", err))
 	}
 
-	quotes, err := p.fetchQuotesForPortfolio()
+	p.fetchAndUpdateQuotes()
+}
 
+func (p *PortfolioPresenter) fetchAndUpdateQuotes() {
+	quotes, err := p.fetchQuotesForPortfolio()
 	if err != nil {
-		p.setStatusMessage("Failed fetching quotes from server")
+		msg := "Failed fetching quotes from server. "
+		if p.updated {
+			msg += p.lastUpdateMessage()
+		}
+		p.setStatusMessage(msg)
 		return
 	}
 
+	p.updated = true
+	p.lastUpdate = time.Now()
 	p.fillPortfolioTable(portfolio, quotes)
-	p.setStatusMessage(fmt.Sprintf("Last update: %v", time.Now().Format(DATE_FORMAT)))
+	p.setStatusMessage(p.lastUpdateMessage())
+}
+
+func (p *PortfolioPresenter) lastUpdateMessage() string {
+	return fmt.Sprintf("Last update: %v", p.lastUpdate.Format(dateFormat))
 }
 
 func (p *PortfolioPresenter) fetchQuotesForPortfolio() (map[string]*domain.Quote, error) {
@@ -141,39 +146,19 @@ func (p *PortfolioPresenter) ProcessUiEvent(event Event) {
 func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quotes map[string]*domain.Quote) {
 	table := GetPortfolioTable()
 	table.Rows = make([]*PortfolioRow, 0, len(portfolio.Entries))
-	totalValue := 0.0
 	for _, entry := range portfolio.Entries {
 		quote := quotes[entry.CurrencyId]
 		row := &PortfolioRow{
 			AssetName:     entry.CurrencyId,
-			AssetAmount:   formatValue(FLOAT_FORMAT_STRING, entry.Amount),
-			AssetPrice:    formatValue(DOLAR_FORMAT_STRING, quote.Price),
-			AssetValue:    formatValue(DOLAR_FORMAT_STRING, entry.Amount*quote.Price),
-			ValueChange:   formatChange(DOLAR_FORMAT_STRING, quote.Change),
-			PercentChange: formatChange(PERCENT_FORMAT_STRING, quote.PercentChange*100),
+			AssetAmount:   entry.Amount,
+			AssetPrice:    quote.Price,
+			AssetValue:    entry.Amount * quote.Price,
+			ValueChange:   quote.Change,
+			PercentChange: quote.PercentChange * 100,
 		}
 		table.Rows = append(table.Rows, row)
-		totalValue += entry.Amount * quote.Price
 	}
 
-	totalRow := &PortfolioRow{
-		AssetName:  "Total Portfolio Value:",
-		AssetValue: formatValue(DOLAR_FORMAT_STRING, totalValue),
-	}
-	table.Rows = append(table.Rows, totalRow)
-
-	// Notify observers that the table has been upated
+	// Notify observers that the table has been updated
 	table.Observable.Notify()
-}
-
-func formatValue(format string, value float64) string {
-	return fmt.Sprintf(format, value)
-}
-
-func formatChange(format string, change float64) string {
-	if change > 0.0 {
-		return ARROW_UP + " " + formatValue(format, change)
-	} else {
-		return ARROW_DOWN + " " + formatValue(format, change)
-	}
 }
