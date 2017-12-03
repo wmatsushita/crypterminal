@@ -5,8 +5,8 @@ import (
 
 	"time"
 
-	"github.com/wmatsushita/mycrypto/domain"
-	"github.com/wmatsushita/mycrypto/service"
+	"github.com/wmatsushita/crypterminal/domain"
+	"github.com/wmatsushita/crypterminal/service"
 )
 
 const (

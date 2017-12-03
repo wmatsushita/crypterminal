@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/gizak/termui"
-	"github.com/wmatsushita/mycrypto/common"
+	"github.com/wmatsushita/crypterminal/common"
 )
 
 const (
@@ -63,7 +63,7 @@ func (view *TermuiPortfolioView) Init(presenter Presenter) {
 
 func (view *TermuiPortfolioView) refreshPortfolioTable() {
 	data := GetPortfolioTable()
-	view.portfolioTable.Rows = [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
+	view.portfolioTable.Rows = [][]string{{"Currency", "Amount", "Price", "Value (USD)", "Value Change", "% Change"}}
 
 	totalValue, totalValueChange := 0.0, 0.0
 	for _, row := range data.Rows {
@@ -155,7 +155,7 @@ func createStatusBar() *termui.Par {
 }
 
 func createPortfolioTable() *termui.Table {
-	tableData := [][]string{{"Currency", "Ammount", "Price", "Value (USD)", "Value Change", "% Change"}}
+	tableData := [][]string{{"Currency", "Amount", "Price", "Value (USD)", "Value Change", "% Change"}}
 
 	table := termui.NewTable()
 	table.Rows = tableData
@@ -186,7 +186,7 @@ func createMenu() *termui.List {
 }
 
 func createTitle() *termui.Par {
-	title := termui.NewPar(" \n   $$ MyCrypto Portfolio Ticker $$ ")
+	title := termui.NewPar(" \n   $$ Crypterminal Portfolio Ticker $$ ")
 	title.Height = 5
 	title.TextFgColor = termui.ColorGreen
 	title.BorderFg = termui.ColorCyan

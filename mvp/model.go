@@ -1,7 +1,7 @@
 package mvp
 
 import (
-	"github.com/wmatsushita/mycrypto/common"
+	"github.com/wmatsushita/crypterminal/common"
 )
 
 type (
