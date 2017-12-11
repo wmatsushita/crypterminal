@@ -18,3 +18,12 @@ func LoadFromJsonFile(fileName string, v interface{}) error {
 
 	return nil
 }
+
+func Contains(values []string, value string) bool {
+	for _, v := range values {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}

@@ -24,6 +24,7 @@ type Portfolio struct {
 
 type Quote struct {
 	CurrencyId    string
+	CurrencyName  string
 	Price         float64
 	Volume        float64
 	High          float64

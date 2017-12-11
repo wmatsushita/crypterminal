@@ -17,12 +17,17 @@ import (
 )
 
 var (
-	portfolioFlag string
-	httpClient    *http.Client
+	portfolioFlag    string
+	serviceFlag      string
+	fiatCurrencyFlag string
 )
 
+var httpClient *http.Client
+
 func init() {
-	flag.StringVar(&portfolioFlag, "portfolio", "portfolio.json", "Portfolio filename, relative to current folder or absolute.")
+	flag.StringVar(&portfolioFlag, "p", "portfolio.json", "Portfolio filename, relative to current folder or absolute.")
+	flag.StringVar(&serviceFlag, "service", "coinmarketcap", "API service to be used. Possible values are [coinmarketcap, bitfinex].")
+	flag.StringVar(&fiatCurrencyFlag, "fiat", "USD", "Fiat currency used to show prices. Only works with coinmarketcap service. Possible values are [coinmarketcap, bitfinex].")
 
 	httpClient = &http.Client{
 		Timeout: 5 * time.Second,
