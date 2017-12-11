@@ -3,83 +3,83 @@
   "symbol.query.key": "symbols",
   "currency.symbol.map": [
     {
-      "currency": "Aventus",
+      "currency": "aventus",
       "symbol": "tAVTUSD"
     },
     {
-      "currency": "Bitcoin",
+      "currency": "bitcoin",
       "symbol": "tBTCUSD"
     },
     {
-      "currency": "BitcoinCash",
+      "currency": "bitcoin-cash",
       "symbol": "tBCHUSD"
     },
     {
-      "currency": "BitcoinGold",
+      "currency": "bitcoin-gold",
       "symbol": "tBTGUSD"
     },
     {
-      "currency": "Dash",
+      "currency": "dash",
       "symbol": "tDSHUSD"
     },
     {
-      "currency": "Eos",
+      "currency": "eos",
       "symbol": "tEOSUSD"
     },
     {
-      "currency": "Eidoo",
+      "currency": "eidoo",
       "symbol": "tEDOUSD"
     },
     {
-      "currency": "Ethereum",
+      "currency": "ethereum",
       "symbol": "tETHUSD"
     },
     {
-      "currency": "EthereumClassic",
+      "currency": "ethereum-classic",
       "symbol": "tETCUSD"
     },
     {
-      "currency": "Iota",
+      "currency": "iota",
       "symbol": "tIOTUSD"
     },
     {
-      "currency": "Litecoin",
+      "currency": "litecoin",
       "symbol": "tLTCUSD"
     },
     {
-      "currency": "MetaverseETP",
+      "currency": "metaverse",
       "symbol": "tETPUSD"
     },
     {
-      "currency": "Monero",
+      "currency": "monero",
       "symbol": "tXMRUSD"
     },
     {
-      "currency": "Neo",
+      "currency": "neo",
       "symbol": "tNEOUSD"
     },
     {
-      "currency": "OmiseGO",
+      "currency": "omisego",
       "symbol": "tOMGUSD"
     },
     {
-      "currency": "Qtum",
+      "currency": "qtum",
       "symbol": "tQTMUSD"
     },
     {
-      "currency": "Ripple",
+      "currency": "ripple",
       "symbol": "tXRPUSD"
     },
     {
-      "currency": "Santiment",
+      "currency": "santiment",
       "symbol": "tSANUSD"
     },
     {
-      "currency": "Streamr",
+      "currency": "streamr",
       "symbol": "tDATUSD"
     },
     {
-      "currency": "Zcash",
+      "currency": "zcash",
       "symbol": "tZECUSD"
     }
   ]

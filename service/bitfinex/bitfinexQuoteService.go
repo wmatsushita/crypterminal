@@ -125,6 +125,7 @@ func parseQuoteResponse(body []byte) (map[string]*domain.Quote, error) {
 			switch i {
 			case 0:
 				quote.CurrencyId = symbolToCurrency[value.(string)]
+				quote.CurrencyName = quote.CurrencyId
 			case 5:
 				quote.Change = value.(float64)
 			case 6:

@@ -149,7 +149,7 @@ func (p *PortfolioPresenter) fillPortfolioTable(portfolio *domain.Portfolio, quo
 	for _, entry := range portfolio.Entries {
 		quote := quotes[entry.CurrencyId]
 		row := &PortfolioRow{
-			AssetName:     entry.CurrencyId,
+			AssetName:     quote.CurrencyName,
 			AssetAmount:   entry.Amount,
 			AssetPrice:    quote.Price,
 			AssetValue:    entry.Amount * quote.Price,

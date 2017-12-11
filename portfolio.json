@@ -1,82 +1,82 @@
 [
   {
-    "currency": "Aventus",
+    "currency": "aventus",
     "amount": 0
   },
   {
-    "currency": "Bitcoin",
+    "currency": "bitcoin",
     "amount": 0
   },
   {
-    "currency": "BitcoinCash",
+    "currency": "bitcoin-cash",
     "amount": 0
   },
   {
-    "currency": "BitcoinGold",
+    "currency": "bitcoin-gold",
     "amount": 0
   },
   {
-    "currency": "Dash",
+    "currency": "dash",
     "amount": 0
   },
   {
-    "currency": "Eos",
+    "currency": "eos",
     "amount": 0
   },
   {
-    "currency": "Eidoo",
+    "currency": "eidoo",
     "amount": 0
   },
   {
-    "currency": "Ethereum",
+    "currency": "ethereum",
     "amount": 0
   },
   {
-    "currency": "EthereumClassic",
+    "currency": "ethereum-classic",
     "amount": 0
   },
   {
-    "currency": "Iota",
+    "currency": "iota",
     "amount": 0
   },
   {
-    "currency": "Litecoin",
+    "currency": "litecoin",
     "amount": 0
   },
   {
-    "currency": "MetaverseETP",
+    "currency": "metaverse",
     "amount": 0
   },
   {
-    "currency": "Monero",
+    "currency": "monero",
     "amount": 0
   },
   {
-    "currency": "Neo",
+    "currency": "neo",
     "amount": 0
   },
   {
-    "currency": "OmiseGO",
+    "currency": "omisego",
     "amount": 0
   },
   {
-    "currency": "Qtum",
+    "currency": "qtum",
     "amount": 0
   },
   {
-    "currency": "Ripple",
+    "currency": "ripple",
     "amount": 0
   },
   {
-    "currency": "Santiment",
+    "currency": "santiment",
     "amount": 0
   },
   {
-    "currency": "Streamr",
+    "currency": "streamr",
     "amount": 0
   },
   {
-    "currency": "Zcash",
+    "currency": "zcash",
     "amount": 0
   }
 ]
