@@ -94,12 +94,17 @@ func parseQuoteResponse(body []byte, currencyIds []string) (map[string]*domain.Q
 			quote.CurrencyName = record.Name
 			quote.Price, err = strconv.ParseFloat(record.PriceUsd, 64)
 			if err != nil {
-				return nil, common.NewErrorWithCause("Could not convert price to number", err)
+				return nil, common.NewErrorWithCause("Could not convert quote price to number", err)
+			}
+			quote.Volume, err = strconv.ParseFloat(record.Volume24hUsd, 64)
+			if err != nil {
+				return nil, common.NewErrorWithCause("Could not convert quote volume to number", err)
 			}
 			quote.PercentChange, err = strconv.ParseFloat(record.PercentChange24h, 64)
 			if err != nil {
-				return nil, common.NewErrorWithCause("Could not convert percent change to number", err)
+				return nil, common.NewErrorWithCause("Could not convert quote percent change to number", err)
 			}
+			quote.PercentChange = quote.PercentChange / 100
 			priceBefore := quote.Price / (quote.PercentChange + 1)
 			quote.Change = quote.Price - priceBefore
 

@@ -1,6 +1,6 @@
 package coinmarketcap
 
-const (
+var (
 	QuoteEndpoint        string = "https://api.coinmarketcap.com/v1/ticker/"
 	FiatCurrencyParamKey string = "convert"
 	LimitParamKey        string = "limit"
